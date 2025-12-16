@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Church Financial System</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar Navigation -->
+        <nav class="sidebar">
+            <div class="sidebar-header">
+                <h2><i class="fas fa-church"></i> Church Finance</h2>
+            </div>
+            <ul class="nav-menu">
+                <li>
+                    <a class="nav-item active" data-section="dashboard" href="#dashboard">
+                        <i class="fas fa-tachometer-alt"></i> Dashboard
+                    </a>
+                </li>
+                <li>
+                    <a class="nav-item" data-section="members" href="#members">
+                        <i class="fas fa-users"></i> Members
+                    </a>
+                </li>
+                <li>
+                    <a class="nav-item" data-section="tithes" href="#tithes">
+                        <i class="fas fa-donate"></i> Revenue
+                    </a>
+                </li>
+                <li>
+                    <a class="nav-item" data-section="expenses" href="#expenses">
+                        <i class="fas fa-money-bill-wave"></i> Expenses
+                    </a>
+                </li>
+                <li>
+                    <a class="nav-item" data-section="budget" href="#budget">
+                        <i class="fas fa-chart-pie"></i> Budget
+                    </a>
+                </li>
+                <li>
+                    <a class="nav-item" data-section="reports" href="#reports">
+                        <i class="fas fa-file-alt"></i> Reports
+                    </a>
+                </li>
+                <li>
+                    <a class="nav-item" data-section="settings" href="#settings">
+                        <i class="fas fa-cog"></i> Settings
+                    </a>
+                </li>
+            </ul>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Header -->
+            <header class="header">
+                <div class="header-left">
+                    <button class="menu-toggle" id="menuToggle">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <div class="logo-section">
+                        <div id="headerLogo">
+                            <i class="fas fa-church logo-icon"></i>
+                        </div>
+                        <div class="logo-text">
+                            <h1 id="pageTitle">Dashboard</h1>
+                            <span class="church-name" id="headerChurchName">Your Church Name</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="header-right">
+                    <div class="user-info">
+                        <i class="fas fa-user-circle"></i>
+                        <span>Administrator</span>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Dashboard Section -->
+            <section id="dashboard" class="content-section active">
+                <div class="dashboard-stats">
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-coins"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3>Total Revenue</h3>
+
+                            <p class="stat-value" id="totalRevenue">$0.00</p>
+                            <small>This Month</small>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-money-bill"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3>Total Expenses</h3>
+                            <p class="stat-value" id="totalExpenses">$0.00</p>
+                            <small>This Month</small>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3>Net Balance</h3>
+                            <p class="stat-value" id="netBalance">$0.00</p>
+                            <small>This Month</small>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3>Active Members</h3>
+                            <p class="stat-value" id="activeMembers">0</p>
+                            <small>Total</small>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="dashboard-charts">
+                    <div class="chart-container">
+                        <h3>Monthly Income vs Expenses</h3>
+                        <canvas id="incomeExpenseChart"></canvas>
+                    </div>
+                    <div class="chart-container">
+                        <h3>Revenue Categories</h3>
+                        <canvas id="revenueCategoriesChart"></canvas>
+                        <h3>Revenue Categories</h3>
+                        <canvas id="titheCategoriesChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="recent-activities">
+                    <h3>Recent Transactions</h3>
+                    <div class="activities-list" id="recentTransactions">
+                        <!-- Recent transactions will be populated here -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- Members Section -->
+            <section id="members" class="content-section">
+                <div class="section-header">
+                    <h2>Member Management</h2>
+                    <button class="btn btn-primary" id="addMemberBtn">
+                        <i class="fas fa-plus"></i> Add Member
+                    </button>
+                </div>
+                
+                <div class="search-filter">
+                    <input type="text" id="memberSearch" placeholder="Search members...">
+                    <select id="memberFilter">
+                        <option value="all">All Members</option>
+                        <option value="active">Active</option>
+                        <option value="inactive">Inactive</option>
+                    </select>
+                </div>
+
+                <div class="members-table">
+                    <table id="membersTable">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Phone</th>
+                                <th>Status</th>
+                                <th>Join Date</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="membersTableBody">
+                            <!-- Members will be populated here -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+            <!-- Revenue Section -->
+
+            <!-- Tithes Section -->
+            <section id="tithes" class="content-section">
+                <div class="section-header">
+                    <h2>Revenue Management</h2>
+                    <button class="btn btn-primary" id="addTitheBtn">
+                        <i class="fas fa-plus"></i> Record Revenue
+                    </button>
+                </div>
+
+                <div class="tithe-form" id="titheForm" style="display: none;">
+                    <h3>Record New Revenue</h3>
+                    <form id="titheFormElement">
+                        <div class="form-group">
+                            <label for="titheMember">Member</label>
+                            <select id="titheMember" name="titheMember" required>
+                                <option value="">Select Member</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="titheAmount">Amount</label>
+                            <input type="number" id="titheAmount" name="titheAmount" step="0.01" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="titheType">Revenue Type</label>
+                            <select id="titheType" name="titheType" required>
+                                <option value="tithes">Tithes</option>
+                                <option value="offering">Offering</option>
+                                <option value="conferences">Conferences</option>
+                                <option value="special_collections">Special Collections</option>
+                                <option value="others">Others</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="titheDate">Date</label>
+                            <input type="date" id="titheDate" name="titheDate" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="titheNotes">Notes</label>
+                            <textarea id="titheNotes" name="titheNotes" rows="3"></textarea>
+                        </div>
+                        <div class="form-actions">
+                            <button type="submit" class="btn btn-primary">Save</button>
+                            <button type="button" class="btn btn-secondary" id="cancelTitheBtn">Cancel</button>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="tithes-table">
+                    <table id="tithesTable">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Member</th>
+                                <th>Type</th>
+                                <th>Amount</th>
+                                <th>Notes</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tithesTableBody">
+                            <!-- Tithes will be populated here -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Expenses Section -->
+            <section id="expenses" class="content-section">
+                <div class="section-header">
+                    <h2>Expense Management</h2>
+                    <button class="btn btn-primary" id="addExpenseBtn">
+                        <i class="fas fa-plus"></i> Add Expense
+                    </button>
+                </div>
+
+                <div class="expense-form" id="expenseForm" style="display: none;">
+                    <h3>Record New Expense</h3>
+                    <form id="expenseFormElement">
+                        <div class="form-group">
+                            <label for="expenseCategory">Category</label>
+                            <select id="expenseCategory" name="expenseCategory" required>
+                                <option value="">Select Category</option>
+                                <option value="utilities">Utilities</option>
+                                <option value="salary">Salary</option>
+                                <option value="maintenance">Maintenance</option>
+                                <option value="outreach">Outreach</option>
+                                <option value="office">Office Supplies</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="expenseAmount">Amount</label>
+                            <input type="number" id="expenseAmount" name="expenseAmount" step="0.01" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="expenseDescription">Description</label>
+                            <input type="text" id="expenseDescription" name="expenseDescription" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="expenseDate">Date</label>
+                            <input type="date" id="expenseDate" name="expenseDate" required>
+                        </div>
+                        <div class="form-actions">
+                            <button type="submit" class="btn btn-primary">Save</button>
+                            <button type="button" class="btn btn-secondary" id="cancelExpenseBtn">Cancel</button>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="expenses-table">
+                    <table id="expensesTable">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Category</th>
+                                <th>Description</th>
+                                <th>Amount</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="expensesTableBody">
+                            <!-- Expenses will be populated here -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Budget Section -->
+            <section id="budget" class="content-section">
+                <div class="section-header">
+                    <h2>Budget Management</h2>
+                    <div class="budget-actions">
+                        <button class="btn btn-primary" id="setBudgetBtn">
+                            <i class="fas fa-plus"></i> Set Budget Manually
+                        </button>
+                        <button class="btn btn-secondary" id="uploadBudgetBtn">
+                            <i class="fas fa-upload"></i> Upload from Excel
+                        </button>
+                        <input type="file" id="budgetExcelFile" accept=".xlsx,.xls,.csv" style="display: none;">
+                    </div>
+                </div>
+
+                <div class="budget-overview">
+                    <div class="budget-chart">
+                        <h3>Budget vs Actual</h3>
+                        <canvas id="budgetChart"></canvas>
+                    </div>
+                    <div class="budget-summary">
+                        <h3>Budget Summary</h3>
+                        <div id="budgetSummary">
+                            <!-- Budget summary will be populated here -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Excel Upload Modal -->
+                <div id="excelUploadModal" class="modal">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h3>Upload Budget from Excel</h3>
+                            <span class="close" id="closeExcelModal">&times;</span>
+                        </div>
+                        <div class="modal-body">
+                            <div class="excel-upload-info">
+                                <h4>Excel File Format Requirements:</h4>
+                                <ul>
+                                    <li><strong>Column A:</strong> Category (e.g., "Utilities", "Salary", "Maintenance")</li>
+                                    <li><strong>Column B:</strong> Budget Amount (numeric values only)</li>
+                                    <li><strong>First row:</strong> Headers (will be ignored)</li>
+                                    <li><strong>Supported categories:</strong> Utilities, Salary, Maintenance, Outreach, Office, Other</li>
+                                </ul>
+                                <div class="excel-example">
+                                    <h5>Example Excel Format:</h5>
+                                    <table class="example-table">
+                                        <thead>
+                                            <tr>
+                                                <th>Category</th>
+                                                <th>Budget Amount</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td>Utilities</td>
+                                                <td>500.00</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Salary</td>
+                                                <td>2500.00</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Maintenance</td>
+                                                <td>300.00</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <div class="excel-upload-actions">
+                                <button class="btn btn-primary" id="selectExcelFileBtn">
+                                    <i class="fas fa-file-excel"></i> Select Excel File
+                                </button>
+                                <button class="btn btn-secondary" id="downloadTemplateBtn">
+                                    <i class="fas fa-download"></i> Download Template
+                                </button>
+                            </div>
+                            <div id="excelPreview" class="excel-preview" style="display: none;">
+                                <h4>Preview:</h4>
+                                <div id="excelDataPreview"></div>
+                                <div class="excel-import-actions">
+                                    <button class="btn btn-success" id="importExcelDataBtn">
+                                        <i class="fas fa-check"></i> Import Budget Data
+                                    </button>
+                                    <button class="btn btn-secondary" id="cancelExcelImportBtn">
+                                        <i class="fas fa-times"></i> Cancel
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Reports Section -->
+            <section id="reports" class="content-section">
+                <div class="section-header">
+                    <div class="report-header">
+                        <div class="report-logo">
+                            <div id="reportLogo">
+                                <i class="fas fa-church"></i>
+                            </div>
+                            <div class="report-church-info">
+                                <h2 id="reportChurchName">Your Church Name</h2>
+                                <p>Financial Reports</p>
+                            </div>
+                        </div>
+                        <div class="report-actions">
+                            <select id="reportType">
+                                <option value="monthly">Monthly Report</option>
+                                <option value="quarterly">Quarterly Report</option>
+                                <option value="annual">Annual Report</option>
+                                <option value="custom">Custom Range</option>
+                            </select>
+                            <button class="btn btn-primary" id="generateReportBtn">
+                                <i class="fas fa-file-pdf"></i> Generate Report
+                            </button>
+                            <button class="btn btn-secondary" id="exportDataBtn">
+                                <i class="fas fa-download"></i> Export Data
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="reports-content">
+                    <div id="reportResults">
+                        <!-- Report results will be populated here -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- Settings Section -->
+            <section id="settings" class="content-section">
+                <div class="section-header">
+                    <h2>System Settings</h2>
+                </div>
+
+                <div class="settings-content">
+                    <div class="settings-section">
+                        <h3>Church Information</h3>
+                        <form id="churchInfoForm">
+                            <div class="form-group">
+                                <label for="churchName">Church Name</label>
+                                <input type="text" id="churchName" name="churchName" value="Your Church Name">
+                            </div>
+                            <div class="form-group">
+                                <label for="churchLogo">Church Logo</label>
+                                <div class="logo-upload-container">
+                                    <input type="file" id="churchLogo" name="churchLogo" accept="image/*" style="display: none;">
+                                    <div class="current-logo-preview" id="currentLogoPreview">
+                                        <i class="fas fa-church"></i>
+                                        <span>No logo uploaded</span>
+                                    </div>
+                                    <div class="logo-upload-actions">
+                                        <button type="button" class="btn btn-secondary btn-sm" id="uploadLogoBtn">
+                                            <i class="fas fa-upload"></i> Upload Logo
+                                        </button>
+                                        <button type="button" class="btn btn-danger btn-sm" id="removeLogoBtn" style="display: none;">
+                                            <i class="fas fa-trash"></i> Remove Logo
+                                        </button>
+                                    </div>
+                                </div>
+                                <small class="form-help">Recommended: PNG or JPG, max 2MB, square aspect ratio</small>
+                            </div>
+                            <div class="form-group">
+                                <label for="churchAddress">Address</label>
+                                <textarea id="churchAddress" name="churchAddress" rows="3"></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label for="churchPhone">Phone</label>
+                                <input type="tel" id="churchPhone" name="churchPhone">
+                            </div>
+                            <div class="form-group">
+                                <label for="churchEmail">Email</label>
+                                <input type="email" id="churchEmail" name="churchEmail">
+                            </div>
+                            <button type="submit" class="btn btn-primary">Save Settings</button>
+                        </form>
+                    </div>
+
+                    <div class="settings-section">
+                        <h3>Backup & Restore</h3>
+                        <div class="backup-actions">
+                            <button class="btn btn-primary" id="backupBtn">
+                                <i class="fas fa-download"></i> Backup Data
+                            </button>
+                            <button class="btn btn-secondary" id="restoreBtn">
+                                <i class="fas fa-upload"></i> Restore Data
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Member Modal -->
+    <div id="memberModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="memberModalTitle">Add Member</h3>
+                <span class="close" id="closeMemberModal">&times;</span>
+            </div>
+            <form id="memberForm">
+                <div class="form-group">
+                    <label for="memberName">Full Name</label>
+                    <input type="text" id="memberName" name="memberName" required>
+                </div>
+                <div class="form-group">
+                    <label for="memberEmail">Email</label>
+                    <input type="email" id="memberEmail" name="memberEmail">
+                </div>
+                <div class="form-group">
+                    <label for="memberPhone">Phone</label>
+                    <input type="tel" id="memberPhone" name="memberPhone">
+                </div>
+                <div class="form-group">
+                    <label for="memberAddress">Address</label>
+                    <textarea id="memberAddress" name="memberAddress" rows="2"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="memberStatus">Status</label>
+                    <select id="memberStatus" name="memberStatus">
+                        <option value="active">Active</option>
+                        <option value="inactive">Inactive</option>
+                    </select>
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">Save</button>
+                    <button type="button" class="btn btn-secondary" id="cancelMemberBtn">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
