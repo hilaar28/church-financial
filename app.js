@@ -6,7 +6,7 @@ class ChurchFinanceSystem {
         this.expenses = JSON.parse(localStorage.getItem('churchExpenses') || '[]');
         this.budgets = JSON.parse(localStorage.getItem('churchBudgets') || '{}');
         this.settings = JSON.parse(localStorage.getItem('churchSettings') || JSON.stringify({
-            churchName: 'Your Church Name',
+            churchName: 'AFM in Zimbabwe Belvedere Assembly',
             churchAddress: '',
             churchPhone: '',
             churchEmail: '',
@@ -1239,7 +1239,7 @@ class ChurchFinanceSystem {
     }
 
     updateChurchDisplay() {
-        const churchName = this.settings.churchName || 'Your Church Name';
+        const churchName = this.settings.churchName || 'AFM in Zimbabwe Belvedere Assembly';
         document.getElementById('headerChurchName').textContent = churchName;
         document.getElementById('reportChurchName').textContent = churchName;
 

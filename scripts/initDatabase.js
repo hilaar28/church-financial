@@ -103,7 +103,7 @@ async function initializeDatabase() {
         // Insert default settings
         await connection.execute(`
             INSERT IGNORE INTO settings (setting_key, setting_value) VALUES
-            ('church_name', 'Your Church Name'),
+            ('church_name', 'AFM in Zimbabwe Belvedere Assembly'),
             ('church_address', ''),
             ('church_phone', ''),
             ('church_email', ''),
