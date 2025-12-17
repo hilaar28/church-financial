@@ -157,6 +157,7 @@ class ChurchFinanceSystem {
         document.getElementById('addTitheBtn').addEventListener('click', () => this.showTitheForm());
         document.getElementById('titheFormElement').addEventListener('submit', (e) => this.saveTithe(e));
         document.getElementById('cancelTitheBtn').addEventListener('click', () => this.hideTitheForm());
+        document.getElementById('titheMember').addEventListener('change', (e) => this.handleContributorChange(e));
 
         // Expense management
         document.getElementById('addExpenseBtn').addEventListener('click', () => this.showExpenseForm());
@@ -582,13 +583,18 @@ class ChurchFinanceSystem {
     updateMemberSelects() {
         const selects = document.querySelectorAll('#titheMember');
         selects.forEach(select => {
-            select.innerHTML = '<option value="">Select Member</option>';
+            select.innerHTML = '<option value="">Select Contributor</option>';
             this.members.forEach(member => {
                 const option = document.createElement('option');
                 option.value = member.id;
                 option.textContent = member.name;
                 select.appendChild(option);
             });
+            // Add Others option
+            const othersOption = document.createElement('option');
+            othersOption.value = 'others';
+            othersOption.textContent = 'Others/Non-members';
+            select.appendChild(othersOption);
         });
     }
 
@@ -596,11 +602,35 @@ class ChurchFinanceSystem {
     showTitheForm() {
         document.getElementById('titheForm').style.display = 'block';
         document.getElementById('titheDate').value = new Date().toISOString().split('T')[0];
+        // Reset form
+        this.hideOtherContributorField();
     }
 
     hideTitheForm() {
         document.getElementById('titheForm').style.display = 'none';
         document.getElementById('titheFormElement').reset();
+        this.hideOtherContributorField();
+    }
+
+    handleContributorChange(event) {
+        const selectedValue = event.target.value;
+        if (selectedValue === 'others') {
+            this.showOtherContributorField();
+        } else {
+            this.hideOtherContributorField();
+        }
+    }
+
+    showOtherContributorField() {
+        document.getElementById('otherContributorGroup').style.display = 'block';
+        document.getElementById('otherContributorName').setAttribute('required', 'required');
+        document.getElementById('otherContributorName').focus();
+    }
+
+    hideOtherContributorField() {
+        document.getElementById('otherContributorGroup').style.display = 'none';
+        document.getElementById('otherContributorName').removeAttribute('required');
+        document.getElementById('otherContributorName').value = '';
     }
 
     async saveTithe(e) {
@@ -608,12 +638,21 @@ class ChurchFinanceSystem {
 
         const formData = new FormData(e.target);
         const memberId = formData.get('titheMember');
-        const member = this.members.find(m => m.id == memberId);
+        let memberName = 'Unknown';
+
+        if (memberId === 'others') {
+            // Handle "Others" case
+            memberName = formData.get('otherContributorName') || 'Others';
+        } else {
+            // Handle regular member case
+            const member = this.members.find(m => m.id == memberId);
+            memberName = member ? member.name : 'Unknown';
+        }
 
         const titheData = {
             id: this.useServer ? undefined : Date.now().toString(),
-            memberId: memberId,
-            memberName: member ? member.name : 'Unknown',
+            memberId: memberId === 'others' ? null : memberId,
+            memberName: memberName,
             amount: parseFloat(formData.get('titheAmount')),
             type: formData.get('titheType'),
             date: formData.get('titheDate'),
