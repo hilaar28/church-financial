@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Member Edit Test</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="app-container">
+        <main class="main-content">
+            <header class="header">
+                <div class="header-left">
+                    <div class="logo-section">
+                        <div id="headerLogo">
+                            <i class="fas fa-church logo-icon"></i>
+                        </div>
+                        <div class="logo-text">
+                            <h1 id="pageTitle">Member Edit Test</h1>
+                            <span class="church-name" id="headerChurchName">Test Church</span>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Members Section -->
+            <section id="members" class="content-section active">
+                <div class="section-header">
+                    <h2>Member Management Test</h2>
+                    <button class="btn btn-primary" id="addMemberBtn">
+                        <i class="fas fa-plus"></i> Add Test Member
+                    </button>
+                </div>
+                
+                <div class="members-table">
+                    <table id="membersTable">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Phone</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="membersTableBody">
+                            <!-- Members will be populated here -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Member Modal -->
+    <div id="memberModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="memberModalTitle">Add Member</h3>
+                <span class="close" id="closeMemberModal">&times;</span>
+            </div>
+            <form id="memberForm">
+                <div class="form-group">
+                    <label for="memberName">Full Name</label>
+                    <input type="text" id="memberName" name="memberName" required>
+                </div>
+                <div class="form-group">
+                    <label for="memberEmail">Email</label>
+                    <input type="email" id="memberEmail" name="memberEmail">
+                </div>
+                <div class="form-group">
+                    <label for="memberPhone">Phone</label>
+                    <input type="tel" id="memberPhone" name="memberPhone">
+                </div>
+                <div class="form-group">
+                    <label for="memberAddress">Address</label>
+                    <textarea id="memberAddress" name="memberAddress" rows="2"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="memberStatus">Status</label>
+                    <select id="memberStatus" name="memberStatus">
+                        <option value="active">Active</option>
+                        <option value="inactive">Inactive</option>
+                    </select>
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">Save</button>
+                    <button type="button" class="btn btn-secondary" id="cancelMemberBtn">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+    <script>
+        // Add some test members for debugging
+        console.log('=== MEMBER EDIT TEST START ===');
+        
+        // Wait for the app to initialize
+        setTimeout(() => {
+            console.log('App object available:', typeof window.app);
+            console.log('Current members:', window.app.members);
+            
+            // Add test members
+            const testMembers = [
+                {
+                    id: '1',
+                    name: 'John Doe',
+                    email: 'john@example.com',
+                    phone: '123-456-7890',
+                    address: '123 Main St',
+                    status: 'active',
+                    joinDate: '2024-01-15'
+                },
+                {
+                    id: '2',
+                    name: 'Jane Smith',
+                    email: 'jane@example.com',
+                    phone: '987-654-3210',
+                    address: '456 Oak Ave',
+                    status: 'active',
+                    joinDate: '2024-02-20'
+                },
+                {
+                    id: '3',
+                    name: 'Bob Johnson',
+                    email: 'bob@example.com',
+                    phone: '555-123-4567',
+                    address: '789 Pine Rd',
+                    status: 'inactive',
+                    joinDate: '2024-03-10'
+                }
+            ];
+            
+            // Set test members
+            window.app.members = testMembers;
+            console.log('Set test members:', window.app.members);
+            
+            // Reload the members table
+            window.app.loadMembers();
+            
+            console.log('=== MEMBER EDIT TEST SETUP COMPLETE ===');
+        }, 1000);
+    </script>
+</body>
+</html>

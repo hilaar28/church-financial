@@ -566,7 +566,10 @@ class ChurchFinanceSystem {
                     this.saveMembers();
                 } else {
                     console.log('Adding new member to localStorage...');
-                    this.members.push(memberData);
+                    // Assign a unique ID for new members in localStorage mode
+                    const newMemberId = Date.now().toString();
+                    const newMember = { ...memberData, id: newMemberId };
+                    this.members.push(newMember);
                     this.saveMembers();
                 }
             }
@@ -617,10 +620,15 @@ class ChurchFinanceSystem {
     async deleteMember(memberId) {
         if (confirm('Are you sure you want to delete this member?')) {
             try {
-                await this.apiRequest(`/members/${memberId}`, {
-                    method: 'DELETE'
-                });
+                if (this.useServer) {
+                    await this.apiRequest(`/members/${memberId}`, {
+                        method: 'DELETE'
+                    });
+                }
                 this.members = this.members.filter(m => m.id != memberId);
+                if (!this.useServer) {
+                    this.saveMembers();
+                }
                 this.loadMembers();
                 this.showAlert('Member deleted successfully!', 'success');
             } catch (error) {
