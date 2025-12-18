@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Edit Button Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test-section { background: #f0f0f0; padding: 15px; margin: 10px 0; border-radius: 5px; }
+        button { margin: 5px; padding: 8px 12px; }
+        .log { background: #fff; border: 1px solid #ccc; padding: 10px; margin: 5px 0; max-height: 200px; overflow-y: auto; }
+    </style>
+</head>
+<body>
+    <h1>Simple Edit Button Test</h1>
+
+    <div class="test-section">
+        <h2>Test 1: Direct Event Listener</h2>
+        <button id="testBtn1">Test Edit Button 1</button>
+        <div id="log1" class="log">Click the button above...</div>
+    </div>
+
+    <div class="test-section">
+        <h2>Test 2: Dynamic Button Creation</h2>
+        <button onclick="createDynamicButton()">Create Dynamic Button</button>
+        <div id="dynamicContainer"></div>
+        <div id="log2" class="log">Create a button first...</div>
+    </div>
+
+    <div class="test-section">
+        <h2>Test 3: App Integration Test</h2>
+        <button onclick="testAppIntegration()">Test App Integration</button>
+        <div id="log3" class="log">Test app integration...</div>
+    </div>
+
+    <script src="app.js"></script>
+    <script>
+        // Test 1: Direct event listener
+        document.getElementById('testBtn1').addEventListener('click', function() {
+            log('log1', 'Button 1 clicked! Event listener fired.');
+            log('log1', 'Event target: ' + this.tagName + ' with text: ' + this.textContent);
+        });
+
+        // Test 2: Dynamic button creation
+        function createDynamicButton() {
+            const container = document.getElementById('dynamicContainer');
+            const button = document.createElement('button');
+            button.textContent = 'Dynamic Edit Button';
+            button.className = 'btn btn-secondary btn-sm';
+            button.addEventListener('click', function() {
+                log('log2', 'Dynamic button clicked! Event listener fired.');
+                log('log2', 'Button text: ' + this.textContent);
+                log('log2', 'Button class: ' + this.className);
+            });
+            container.appendChild(button);
+            log('log2', 'Dynamic button created and event listener attached.');
+        }
+
+        // Test 3: App integration
+        function testAppIntegration() {
+            log('log3', 'Testing app integration...');
+            log('log3', 'App exists: ' + (typeof window.app !== 'undefined'));
+
+            if (window.app) {
+                log('log3', 'App members count: ' + window.app.members.length);
+                log('log3', 'App editMember function exists: ' + (typeof window.app.editMember === 'function'));
+                log('log3', 'App showMemberModal function exists: ' + (typeof window.app.showMemberModal === 'function'));
+
+                // Test calling editMember directly
+                if (window.app.members.length > 0) {
+                    const firstMember = window.app.members[0];
+                    log('log3', 'Attempting to call editMember for: ' + firstMember.name + ' (ID: ' + firstMember.id + ')');
+                    try {
+                        window.app.editMember(firstMember.id);
+                        log('log3', 'editMember called successfully');
+                    } catch (error) {
+                        log('log3', 'Error calling editMember: ' + error.message);
+                    }
+                } else {
+                    log('log3', 'No members in app to test with');
+                }
+            } else {
+                log('log3', 'App not available');
+            }
+        }
+
+        function log(logId, message) {
+            const logDiv = document.getElementById(logId);
+            const timestamp = new Date().toLocaleTimeString();
+            logDiv.innerHTML += '<div>[' + timestamp + '] ' + message + '</div>';
+            logDiv.scrollTop = logDiv.scrollHeight;
+        }
+
+        // Auto-run some tests on load
+        setTimeout(() => {
+            log('log3', 'Page loaded, app should be initialized now');
+            testAppIntegration();
+        }, 1000);
+    </script>
+</body>
+</html>

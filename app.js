@@ -20,21 +20,25 @@ class ChurchFinanceSystem {
     }
 
     async init() {
+        console.log('=== CHURCH FINANCE SYSTEM INIT START ===');
         this.setupEventListeners();
 
         // Try to connect to server, fall back to localStorage if not available
         try {
+            console.log('Testing server connection...');
             await this.testServerConnection();
+            console.log('Server connection successful, using server mode');
             this.useServer = true;
             await this.loadAllData();
         } catch (error) {
-            console.log('Server not available, using localStorage mode');
+            console.log('Server not available, using localStorage mode. Error:', error);
             this.useServer = false;
             this.loadLocalData();
         }
 
         this.updateNavigation();
         this.updateChurchDisplay();
+        console.log('=== CHURCH FINANCE SYSTEM INIT COMPLETE ===');
     }
 
     // Server Connection Test
@@ -57,6 +61,26 @@ class ChurchFinanceSystem {
         this.expenses = JSON.parse(localStorage.getItem('churchExpenses') || '[]');
         this.budgets = JSON.parse(localStorage.getItem('churchBudgets') || '{}');
         this.settings = JSON.parse(localStorage.getItem('churchSettings') || JSON.stringify(this.settings));
+
+        // Add sample data if no data exists
+        if (this.members.length === 0) {
+            this.members = [
+                { id: '1', name: 'John Doe', email: 'john@example.com', phone: '1234567890', address: '123 Main St', status: 'active', joinDate: '2024-01-15' },
+                { id: '2', name: 'Jane Smith', email: 'jane@example.com', phone: '1234567891', address: '456 Oak Ave', status: 'active', joinDate: '2024-02-20' },
+                { id: '3', name: 'Bob Johnson', email: 'bob@example.com', phone: '1234567892', address: '789 Pine Rd', status: 'active', joinDate: '2024-03-10' }
+            ];
+            this.tithes = [
+                { id: '1', memberId: '1', memberName: 'John Doe', amount: 100, type: 'tithes', date: new Date().toISOString().split('T')[0], notes: 'Monthly tithe' },
+                { id: '2', memberId: '2', memberName: 'Jane Smith', amount: 75.5, type: 'tithes', date: new Date().toISOString().split('T')[0], notes: 'Monthly tithe' },
+                { id: '3', memberId: '1', memberName: 'John Doe', amount: 50, type: 'offering', date: new Date().toISOString().split('T')[0], notes: 'Special offering' }
+            ];
+            this.expenses = [
+                { id: '1', category: 'utilities', amount: 150, description: 'Electricity bill', date: new Date().toISOString().split('T')[0] },
+                { id: '2', category: 'salary', amount: 1200, description: 'Pastor salary', date: new Date().toISOString().split('T')[0] },
+                { id: '3', category: 'maintenance', amount: 200, description: 'Building repairs', date: new Date().toISOString().split('T')[0] }
+            ];
+            this.saveAllData();
+        }
 
         this.loadDashboard();
         this.loadMembers();
