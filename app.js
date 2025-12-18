@@ -591,17 +591,30 @@ class ChurchFinanceSystem {
 
         this.members.forEach(member => {
             const row = document.createElement('tr');
+            const editBtn = document.createElement('button');
+            const deleteBtn = document.createElement('button');
+            
+            editBtn.className = 'btn btn-secondary btn-sm';
+            editBtn.textContent = 'Edit';
+            editBtn.addEventListener('click', () => this.editMember(member.id));
+            
+            deleteBtn.className = 'btn btn-danger btn-sm';
+            deleteBtn.textContent = 'Delete';
+            deleteBtn.addEventListener('click', () => this.deleteMember(member.id));
+            
+            const actionsCell = document.createElement('td');
+            actionsCell.appendChild(editBtn);
+            actionsCell.appendChild(deleteBtn);
+            
             row.innerHTML = `
                 <td>${member.name}</td>
                 <td>${member.email || '-'}</td>
                 <td>${member.phone || '-'}</td>
                 <td><span class="status ${member.status}">${member.status}</span></td>
                 <td>${new Date(member.join_date || member.joinDate).toLocaleDateString()}</td>
-                <td>
-                    <button class="btn btn-secondary btn-sm" onclick="app.editMember('${member.id}')">Edit</button>
-                    <button class="btn btn-danger btn-sm" onclick="app.deleteMember('${member.id}')">Delete</button>
-                </td>
             `;
+            row.appendChild(actionsCell);
+            
             tbody.appendChild(row);
         });
 
