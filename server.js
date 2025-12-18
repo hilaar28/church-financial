@@ -169,15 +169,34 @@ app.post('/api/members', (req, res) => {
 
 app.put('/api/members/:id', (req, res) => {
     const { name, email, phone, address, status } = req.body;
+    
+    // Validate required fields
+    if (!name || name.trim() === '') {
+        console.error('Name is required for member update');
+        return res.status(400).json({ error: 'Name is required' });
+    }
+    
+    // Validate status if provided
+    if (status && !['active', 'inactive'].includes(status)) {
+        console.error('Invalid status value:', status);
+        return res.status(400).json({ error: 'Status must be active or inactive' });
+    }
+    
+    console.log('Updating member:', req.params.id, 'with data:', { name, email, phone, address, status });
+    
     db.run(
         'UPDATE members SET name = ?, email = ?, phone = ?, address = ?, status = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?',
-        [name, email || null, phone || null, address || null, status, req.params.id],
+        [name.trim(), email || null, phone || null, address || null, status || 'active', req.params.id],
         function(err) {
             if (err) {
                 console.error('Error updating member:', err);
-                res.status(500).json({ error: 'Failed to update member' });
+                res.status(500).json({ error: 'Failed to update member: ' + err.message });
+            } else if (this.changes === 0) {
+                console.error('Member not found for update:', req.params.id);
+                res.status(404).json({ error: 'Member not found' });
             } else {
-                res.json({ success: true });
+                console.log('Member updated successfully:', req.params.id);
+                res.json({ success: true, id: req.params.id });
             }
         }
     );

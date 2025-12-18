@@ -435,28 +435,47 @@ class ChurchFinanceSystem {
 
     // Member Management
     showMemberModal(memberId = null) {
+        console.log('=== MEMBER MODAL DEBUG START ===');
         console.log('showMemberModal called with memberId:', memberId);
         const modal = document.getElementById('memberModal');
         const form = document.getElementById('memberForm');
         const title = document.getElementById('memberModalTitle');
 
+        console.log('Modal element:', modal);
+        console.log('Form element:', form);
+        console.log('Title element:', title);
+
         if (!modal || !form || !title) {
             console.error('Modal elements not found');
+            console.error('Modal found:', !!modal);
+            console.error('Form found:', !!form);
+            console.error('Title found:', !!title);
             return;
         }
 
         if (memberId) {
+            console.log('Setting up edit mode for memberId:', memberId);
             const member = this.members.find(m => m.id === memberId);
+            console.log('Found member data:', member);
+            
             if (member) {
-                document.getElementById('memberName').value = member.name;
-                document.getElementById('memberEmail').value = member.email;
-                document.getElementById('memberPhone').value = member.phone;
-                document.getElementById('memberAddress').value = member.address;
-                document.getElementById('memberStatus').value = member.status;
+                console.log('Populating form fields with member data...');
+                document.getElementById('memberName').value = member.name || '';
+                document.getElementById('memberEmail').value = member.email || '';
+                document.getElementById('memberPhone').value = member.phone || '';
+                document.getElementById('memberAddress').value = member.address || '';
+                document.getElementById('memberStatus').value = member.status || 'active';
+                
+                console.log('Setting data-member-id attribute to:', memberId);
                 form.setAttribute('data-member-id', memberId);
                 title.textContent = 'Edit Member';
+                console.log('Edit mode setup complete');
+            } else {
+                console.error('Member not found in members array');
+                return;
             }
         } else {
+            console.log('Setting up add mode (no memberId provided)');
             form.reset();
             form.removeAttribute('data-member-id');
             title.textContent = 'Add Member';
@@ -464,6 +483,7 @@ class ChurchFinanceSystem {
 
         console.log('Setting modal display to block');
         modal.style.display = 'block';
+        console.log('=== MEMBER MODAL DEBUG END ===');
     }
 
     hideMemberModal() {
@@ -472,50 +492,93 @@ class ChurchFinanceSystem {
 
     async saveMember(e) {
         e.preventDefault();
+        
+        console.log('=== MEMBER SAVE DEBUG START ===');
+        console.log('Form submitted, checking details...');
+        console.log('Event target:', e.target);
+        console.log('Form elements:', e.target.elements);
+        
+        const formData = new FormData(e.target);
+        const memberId = e.target.getAttribute('data-member-id');
+        
+        console.log('Member ID from form:', memberId);
+        console.log('Is edit operation:', !!memberId);
+        
+        // Debug form data extraction
+        console.log('FormData entries:');
+        for (let [key, value] of formData.entries()) {
+            console.log(`  ${key}: ${value}`);
+        }
+
+        const memberData = {
+            name: formData.get('memberName'),
+            email: formData.get('memberEmail'),
+            phone: formData.get('memberPhone'),
+            address: formData.get('memberAddress'),
+            status: formData.get('memberStatus')
+        };
+        
+        // Only add joinDate for new members
+        if (!memberId) {
+            memberData.joinDate = new Date().toISOString().split('T')[0];
+        }
+        
+        console.log('Member data object:', memberData);
+        console.log('Current members array length:', this.members.length);
 
         try {
-            const formData = new FormData(e.target);
-            const memberId = e.target.getAttribute('data-member-id');
 
-            const memberData = {
-                id: memberId || Date.now().toString(),
-                name: formData.get('memberName'),
-                email: formData.get('memberEmail'),
-                phone: formData.get('memberPhone'),
-                address: formData.get('memberAddress'),
-                status: formData.get('memberStatus'),
-                joinDate: memberId ? undefined : new Date().toISOString().split('T')[0]
-            };
-
+            console.log('Using server mode:', this.useServer);
+            
             if (this.useServer) {
+                console.log('Server mode: Making API request...');
                 if (memberId) {
-                    await this.apiRequest(`/members/${memberId}`, {
+                    console.log('Updating existing member via PUT request...');
+                    const response = await this.apiRequest(`/members/${memberId}`, {
                         method: 'PUT',
                         body: JSON.stringify(memberData)
                     });
+                    console.log('Server response:', response);
+                    
+                    // Update local array with the new data
+                    const updatedMember = { ...memberData, id: memberId };
+                    this.members = this.members.map(m => m.id == memberId ? updatedMember : m);
                 } else {
+                    console.log('Creating new member via POST request...');
                     const newMember = await this.apiRequest('/members', {
                         method: 'POST',
                         body: JSON.stringify(memberData)
                     });
+                    console.log('New member created:', newMember);
                     this.members.push(newMember);
                 }
             } else {
+                console.log('LocalStorage mode: Updating locally...');
                 // LocalStorage mode
                 if (memberId) {
-                    this.members = this.members.map(m => m.id === memberId ? memberData : m);
+                    console.log('Updating member in localStorage array...');
+                    console.log('Before update - members array:', this.members);
+                    this.members = this.members.map(m => {
+                        console.log(`Comparing m.id: ${m.id} with memberId: ${memberId}`);
+                        return m.id == memberId ? { ...memberData, id: memberId } : m;
+                    });
+                    console.log('After update - members array:', this.members);
+                    this.saveMembers();
                 } else {
+                    console.log('Adding new member to localStorage...');
                     this.members.push(memberData);
+                    this.saveMembers();
                 }
-                this.saveMembers();
             }
 
             await this.loadMembers();
             this.hideMemberModal();
             this.showAlert('Member saved successfully!', 'success');
+            console.log('=== MEMBER SAVE DEBUG END ===');
         } catch (error) {
             console.error('Error saving member:', error);
             this.showAlert('Failed to save member', 'error');
+            console.log('=== MEMBER SAVE DEBUG END WITH ERROR ===');
         }
     }
 
@@ -543,6 +606,11 @@ class ChurchFinanceSystem {
     }
 
     editMember(memberId) {
+        console.log('=== EDIT MEMBER DEBUG START ===');
+        console.log('editMember called with memberId:', memberId);
+        console.log('Current members array:', this.members);
+        const member = this.members.find(m => m.id === memberId);
+        console.log('Found member:', member);
         this.showMemberModal(memberId);
     }
 
