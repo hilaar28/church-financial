@@ -352,6 +352,7 @@ class ChurchFinanceSystem {
         // Revenue Categories Chart
         const ctx2 = document.getElementById('revenueCategoriesChart').getContext('2d');
         const revenueCategories = this.getRevenueCategories();
+        console.log('Rendering doughnut chart with data:', revenueCategories);
 
         new Chart(ctx2, {
             type: 'doughnut',
