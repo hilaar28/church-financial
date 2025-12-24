@@ -307,77 +307,106 @@ class ChurchFinanceSystem {
     }
 
     renderCharts() {
-        // Income vs Expenses Chart
-        const ctx1 = document.getElementById('incomeExpenseChart').getContext('2d');
-        const monthlyData = this.getMonthlyData();
+        console.log('=== RENDER CHARTS DEBUG START ===');
+        console.log('Current tithes data:', this.tithes);
+        console.log('Current expenses data:', this.expenses);
 
-        new Chart(ctx1, {
-            type: 'line',
-            data: {
-                labels: monthlyData.labels,
-                datasets: [{
-                    label: 'Income',
-                    data: monthlyData.income,
-                    borderColor: '#27ae60',
-                    backgroundColor: 'rgba(39, 174, 96, 0.1)',
-                    tension: 0.4
-                }, {
-                    label: 'Expenses',
-                    data: monthlyData.expenses,
-                    borderColor: '#e74c3c',
-                    backgroundColor: 'rgba(231, 76, 60, 0.1)',
-                    tension: 0.4
-                }]
-            },
-            options: {
-                responsive: true,
-                plugins: {
-                    legend: {
-                        position: 'top',
-                    }
+        // Income vs Expenses Chart
+        const incomeExpenseCanvas = document.getElementById('incomeExpenseChart');
+        console.log('Income Expense Canvas found:', !!incomeExpenseCanvas);
+        if (!incomeExpenseCanvas) {
+            console.error('Income Expense Chart canvas not found');
+            return;
+        }
+        const ctx1 = incomeExpenseCanvas.getContext('2d');
+        const monthlyData = this.getMonthlyData();
+        console.log('Monthly data for line chart:', monthlyData);
+
+        try {
+            new Chart(ctx1, {
+                type: 'line',
+                data: {
+                    labels: monthlyData.labels,
+                    datasets: [{
+                        label: 'Income',
+                        data: monthlyData.income,
+                        borderColor: '#27ae60',
+                        backgroundColor: 'rgba(39, 174, 96, 0.1)',
+                        tension: 0.4
+                    }, {
+                        label: 'Expenses',
+                        data: monthlyData.expenses,
+                        borderColor: '#e74c3c',
+                        backgroundColor: 'rgba(231, 76, 60, 0.1)',
+                        tension: 0.4
+                    }]
                 },
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        ticks: {
-                            callback: function(value) {
-                                return '$' + value;
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) {
+                                    return '$' + value;
+                                }
                             }
                         }
                     }
                 }
-            }
-        });
+            });
+            console.log('Income vs Expenses chart rendered successfully');
+        } catch (error) {
+            console.error('Error rendering Income vs Expenses chart:', error);
+        }
 
         // Revenue Categories Chart
-        const ctx2 = document.getElementById('revenueCategoriesChart').getContext('2d');
+        const revenueCategoriesCanvas = document.getElementById('revenueCategoriesChart');
+        console.log('Revenue Categories Canvas found:', !!revenueCategoriesCanvas);
+        if (!revenueCategoriesCanvas) {
+            console.error('Revenue Categories Chart canvas not found');
+            return;
+        }
+        const ctx2 = revenueCategoriesCanvas.getContext('2d');
         const revenueCategories = this.getRevenueCategories();
         console.log('Rendering doughnut chart with data:', revenueCategories);
 
-        new Chart(ctx2, {
-            type: 'doughnut',
-            data: {
-                labels: revenueCategories.labels,
-                datasets: [{
-                    data: revenueCategories.data,
-                    backgroundColor: [
-                        '#3498db',
-                        '#e74c3c',
-                        '#f39c12',
-                        '#27ae60',
-                        '#9b59b6'
-                    ]
-                }]
-            },
-            options: {
-                responsive: true,
-                plugins: {
-                    legend: {
-                        position: 'bottom',
+        try {
+            new Chart(ctx2, {
+                type: 'doughnut',
+                data: {
+                    labels: revenueCategories.labels,
+                    datasets: [{
+                        data: revenueCategories.data,
+                        backgroundColor: [
+                            '#3498db',
+                            '#e74c3c',
+                            '#f39c12',
+                            '#27ae60',
+                            '#9b59b6'
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                        }
                     }
                 }
-            }
-        });
+            });
+            console.log('Revenue Categories chart rendered successfully');
+        } catch (error) {
+            console.error('Error rendering Revenue Categories chart:', error);
+        }
+
+        console.log('=== RENDER CHARTS DEBUG END ===');
     }
 
     getMonthlyData() {
