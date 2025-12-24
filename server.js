@@ -126,8 +126,56 @@ function createTables() {
                                 ('church_logo', NULL)
                             `, (err) => {
                                 if (err) return reject(err);
-                                console.log('✅ Database tables created successfully');
-                                resolve();
+
+                                // Insert sample data
+                                console.log('📝 Inserting sample data...');
+
+                                // Sample members
+                                db.run(`
+                                    INSERT OR IGNORE INTO members (id, name, email, phone, address, status, join_date) VALUES
+                                    (1, 'John Doe', 'john@example.com', '+1234567890', '123 Main St', 'active', '2024-01-15'),
+                                    (2, 'Jane Smith', 'jane@example.com', '+1234567891', '456 Oak Ave', 'active', '2024-02-20'),
+                                    (3, 'Bob Johnson', 'bob@example.com', '+1234567892', '789 Pine Rd', 'active', '2024-03-10')
+                                `, (err) => {
+                                    if (err) return reject(err);
+
+                                    // Sample tithes
+                                    db.run(`
+                                        INSERT OR IGNORE INTO tithes (member_id, member_name, amount, type, date, notes) VALUES
+                                        (1, 'John Doe', 100.00, 'tithe', '2024-11-01', 'Monthly tithe'),
+                                        (2, 'Jane Smith', 75.50, 'tithe', '2024-11-01', 'Monthly tithe'),
+                                        (1, 'John Doe', 50.00, 'offering', '2024-11-15', 'Special offering')
+                                    `, (err) => {
+                                        if (err) return reject(err);
+
+                                        // Sample expenses
+                                        db.run(`
+                                            INSERT OR IGNORE INTO expenses (category, amount, description, date) VALUES
+                                            ('utilities', 150.00, 'Electricity bill', '2024-11-01'),
+                                            ('salary', 1200.00, 'Pastor salary', '2024-11-01'),
+                                            ('maintenance', 200.00, 'Building repairs', '2024-11-10'),
+                                            ('office', 75.00, 'Office supplies', '2024-11-05')
+                                        `, (err) => {
+                                            if (err) return reject(err);
+
+                                            // Sample budgets
+                                            db.run(`
+                                                INSERT OR IGNORE INTO budgets (category, amount, year, month) VALUES
+                                                ('utilities', 200.00, strftime('%Y', 'now'), strftime('%m', 'now')),
+                                                ('salary', 1500.00, strftime('%Y', 'now'), strftime('%m', 'now')),
+                                                ('maintenance', 300.00, strftime('%Y', 'now'), strftime('%m', 'now')),
+                                                ('outreach', 250.00, strftime('%Y', 'now'), strftime('%m', 'now')),
+                                                ('office', 100.00, strftime('%Y', 'now'), strftime('%m', 'now')),
+                                                ('other', 150.00, strftime('%Y', 'now'), strftime('%m', 'now'))
+                                            `, (err) => {
+                                                if (err) return reject(err);
+                                                console.log('✅ Sample data inserted');
+                                                console.log('✅ Database tables created successfully');
+                                                resolve();
+                                            });
+                                        });
+                                    });
+                                });
                             });
                         });
                     });
