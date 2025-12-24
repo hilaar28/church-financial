@@ -28,10 +28,30 @@ app.use('/api/', limiter);
 let db;
 
 async function initializeDatabase() {
+    let tempConnection;
+
     try {
         console.log('🔄 Initializing Church Finance Database...');
 
-        // Connect to MySQL
+        // Connect without database first
+        tempConnection = await mysql.createConnection({
+            host: process.env.DB_HOST || 'localhost',
+            user: process.env.DB_USER || 'root',
+            password: process.env.DB_PASSWORD || '',
+            port: process.env.DB_PORT || 3306,
+            authPlugins: {
+                mysql_native_password: () => () => Buffer.from(process.env.DB_PASSWORD + '\0')
+            }
+        });
+
+        // Create database if it doesn't exist
+        await tempConnection.execute('CREATE DATABASE IF NOT EXISTS church_finance');
+        console.log('✅ Database "church_finance" created or already exists');
+
+        // Close temp connection
+        await tempConnection.end();
+
+        // Connect to the specific database
         db = await mysql.createConnection({
             host: process.env.DB_HOST || 'localhost',
             user: process.env.DB_USER || 'root',
@@ -52,6 +72,9 @@ async function initializeDatabase() {
 
     } catch (error) {
         console.error('❌ Database initialization failed:', error);
+        if (tempConnection) {
+            await tempConnection.end();
+        }
         process.exit(1);
     }
 }
